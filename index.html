@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #0f0f0f;
+            color: #ffffff; /* White text for readability */
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center; /* Center items vertically */
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        
+        .ascii-container {
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+        
+        .box {
+            padding: 15px;
+            background-color: #0f0f0f;
+        }
+        
+        /* Add dotted borders for boxes */
+        .bordered-box {
+            border: 2px dotted #6c5ce7; /* Purple border */
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        .ascii-art {
+            white-space: pre;
+            line-height: 1.2;
+            font-size: 14px;
+            padding: 10px;
+            display: inline-block;
+        }
+        
+        .mermaid-art {
+            color: #74b9ff; /* Light blue for mermaid */
+        }
+        
+        .file-tree {
+            display: flex;
+            flex-direction: column;
+            padding-left: 5px;
+        }
+        
+        .folder {
+            margin: 3px 0;
+            color: #a29bfe; /* Light purple for folders */
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .sub-files {
+            margin-left: 20px;
+            border-left: 1px dotted #6c5ce7;
+            padding-left: 10px;
+        }
+        
+        .file {
+            margin: 3px 0;
+            color: #81ecec; /* Light cyan for files */
+            cursor: pointer;
+        }
+        
+        .file:hover, .folder:hover {
+            text-decoration: underline;
+        }
+        
+        .blog-entry {
+            margin-bottom: 15px;
+            border-bottom: 1px dotted #6c5ce7;
+            padding-bottom: 10px;
+        }
+        
+        .date {
+            color: #00cec9; /* Teal for dates */
+            font-weight: bold;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #dfe6e9;
+            font-size: 14px;
+            border-top: 1px dotted #6c5ce7;
+            padding-top: 15px;
+        }
+        
+        a {
+            color: #6c5ce7; /* Matching purple for links */
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+            color: #a29bfe;
+        }
+        
+        .command {
+            color: #ff79c6; /* Pink for commands */
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Flashing cursor */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background-color: #ff79c6;
+            margin-left: 6px;
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .hello {
+            text-align: center; 
+            margin-top: 10px;
+            color: #00cec9;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .social-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .social-links a {
+            color: #74b9ff; /* More thematic blue for contact links */
+            margin: 0 7px;
+            font-weight: bold;
+        }
+        
+        .social-links a:hover {
+            color: #a3d8ff;
+        }
+        
+        .highlight {
+            color: #00cec9;
+            font-weight: bold;
+        }
+        
+        .friend-links a {
+            color: #9c88ff; /* Brighter purple for friend links */
+            margin: 0 7px;
+            font-weight: bold;
+        }
+        
+        .friend-links a:hover {
+            color: #c8b6ff;
+        }
+        
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        
+        .intro {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .bold {
+            font-weight: bold;
+            color: #a29bfe; /* Light purple for bold text */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with mermaid to the left of the intro -->
+        <div class="header">
+            <div class="ascii-container">
+                <div class="ascii-art mermaid-art">
+           __w
+         ,%%%%
+        .%%%_/  ,_
+        %%/(___//
+       ,%%||))-'
+      ,%%%)\(
+      %%'&&\\
+     ,%% &&&&&
+       %  &&&&
+          ,&&'
+        ,&&&
+        ,&&'&&,
+     ,&'   `&.
+                </div>
+            </div>
+            <div class="intro">
+                <div class="command">$ whoami<span class="cursor"></span></div>
+                <p>
+                    Hi! This website is a record of my random projects in <span class="bold">cybersecurity</span>, <span class="bold">systems</span>, <span class="bold">low-level programming</span>, <span class="bold">infrastructure</span>, and whatever new shiny coding thing that I will be obssessed with in the next 10 minutes. I also have reached skunk cost fallacy so I will continue to rice my <span class="bold">ArCh LiNux</span> setup and document my regret here. 
+                </p>
+                <p>
+                    Coding until <span class="bold">3 AM</span> is how I deal with the schizo voices in my head /s /s (not really /s). I used to <span class="bold">REALLY REALLY</span> enjoy vodka, but am now hoping to hoping to turn the leaf and fulfill the pipeline of <span class="bold">once-degen-now-cracked-programmer</span> without popping estrogen. 
+                </p>
+                <p>
+                    Other than that, I am <span class="bold">20</span>, <span class="bold">she/her</span>, and unfortunatly in college atm. My lovely genius boyfriend works on some of the projects here with me.  
+                </p>
+                <div class="social-links">
+                    [<a href="#">pgp key</a>] [<a href="#">email</a>] 
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <!-- Box 1: File Browser -->
+            <div class="bordered-box">
+                <div class="command">$ ls -la<span class="cursor"></span></div>
+                <div class="file-tree">
+                    <div class="folder">blog/</div>
+                    <div class="sub-files">
+                        <!-- div class="file">example.md /-->
+                        <div class="file"> chip-8-emulator.md </div>
+                    </div>
+                    
+                    <div class="folder">writeups/</div>
+                    <div class="sub-files">
+                        <!-- div class="file">example.md /-->
+                    </div>
+                    
+                    <div class="folder">notes/</div>
+                        <!-- div class="file">example.md /-->
+                    <div class="sub-files">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Box 2: Content -->
+            <div class="bordered-box">
+                <div class="command">$ cat /blog/recent<span class="cursor"></span></div>
+          <!--
+          EXAMPLE
+          <div class="blog-entry">
+          <div class="date">[2025-02-28]</div>
+            <p>Discovered and reported a critical zero-day vulnerability in a popular IoT platform. CVE pending.</p>
+          </div>
+                <div style="text-align: center; margin-top: 15px; color: #9c88ff;">...(more)</div>
+          -->
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
