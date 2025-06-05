@@ -1,0 +1,9 @@
+- chip 8 emulator 
+- compiler 
+- open source ctfd framework  
+- pacman emulator
+- red team blue team lab, proxmox notes?
+- ctfd/training platform alerting?
+- python jail notes 
+- rev/pwn/etc. writeups
+- c2 server 
