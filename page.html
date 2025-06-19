@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #0f0f0f;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2, h3, h4, h5 {
+            color: #6c5ce7;
+        }
+        a {
+            color: #74b9ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #a29bfe;
+        }
+        pre, code {
+            background: #1e1e2f;
+            border: 1px dotted #6c5ce7;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+            display: block;
+        }
+        code {
+            display: inline-block;
+        }
+        details {
+            border: 2px dotted #6c5ce7;
+            border-radius: 4px;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #a29bfe;
+            outline: none;
+        }
+        /* Scrollbar for code blocks */
+        pre::-webkit-scrollbar {
+            width: 8px;
+        }
+        pre::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+        pre::-webkit-scrollbar-thumb {
+            background: #6c5ce7;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>My Blog</h1>
+        <div id="post-container" class="bordered-box">
+            <!-- Markdown content will be rendered here -->
+        </div>
+        <script type="text/markdown" id="post-markdown">
+# Welcome to My Blog
+
+This page is rendered from **Markdown**. Below are some example collapsible sections.
+
+<details>
+<summary>Web Specification Snippet</summary>
+
+```html
+<!-- HTML spec excerpt -->
+<canvas id="myCanvas" width="200" height="100"></canvas>
+```
+
+A snippet from the HTML Canvas spec.
+</details>
+
+<details>
+<summary>Code Example</summary>
+
+```javascript
+// Example JavaScript code
+function greet(name) {
+    console.log(`Hello, ${name}!`);
+}
+greet('Asritha');
+```
+
+Demonstrates a simple function.
+</details>
+        </script>
+    </div>
+    <script>
+        // Render the markdown
+        const raw = document.getElementById('post-markdown').textContent;
+        document.getElementById('post-container').innerHTML = marked.parse(raw);
+    </script>
+</body>
+</html>
