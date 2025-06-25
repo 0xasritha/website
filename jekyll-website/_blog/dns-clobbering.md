@@ -4,51 +4,164 @@ layout: post
 collection: blog 
 date: 2025-06-24
 ---
-**Cobber** (in the context of computing): to overwrite
 
-To understand DOM Clobbering, we must understand the intricacies of how **named properties** behave.  
+An XSS attack can usually be mitigated by enforcing Content Secuirty Policy and strict HTML sanitization (e.g. DOMPurify). Sites that allow users to inject HTML (e.g. blogging platforms, CMSs, etc.) often sanitize aggressively until all inputs seem safe. But the key word is “seem." 
+
+An attacker can use benign HTML injection (no `<script>` tags, no inline event handlers, etc.) to bypass website logic and secuirty via <span style="color: #d8b862;"><b>DOM clobbering</b></span>. 😈
+
+
+DOM clobbering abuses a browser feature called 
+ <span style="color: #d8b862;"><b>named property access</b></span> (or 
+  <span style="color: #d8b862;"><b>named properties</b></span> for short), where any element you given an `id` or `name` becomes a JavaScript property on objects like `window`, `document`, HTML forms etc.   
+
+Let's do a simple example. Imagine a website contains the following code: 
+```HTML 
+<body>
+    <form id="myForm" action="/submit" method="POST">
+        <textarea id="userHTML"></textarea>
+        <!--input id="submit"--> 
+        <button id="render"> Render HTML </button>
+    </form>  
+
+    <script>
+        const form = document.getElementById('myForm'); 
+        const userHTML = document.getElementById('userHTML');
+        const renderBtn = document.getElementById('render')
+
+        renderBtn.addEventListener('click', e => { 
+            e.preventDefault(); 
+
+            const cleanHTML = DOMPurify.sanitize(userHTML.value);
+            form.insertAdjacentHTML('beforeend', cleanHTML); // TODO: does this insert inside the form? 
+
+            try { 
+                form.submit(); 
+            } catch (err) { 
+                console.error("How did you get here?", err);
+            }            
+        }) 
+    </script>
+</body>
+```
+
+By injecting `<input name="submit">` within the form, an attacker can "clobber" - or replace - `form.submit()` reference from the default `submit` to the new `input` element. Given you cannot call `submit()` on the `<input>`, this will error out and log `"How did you get here?"`.
+
+^#TODO: show example
+
+DOM clobbering is very context dependent. To easily exploit it, you must first understand the nuances of **named property access** in the DOM API.  
 
 ## Named Properties per the [HTML](`https://html.spec.whatwg.org/multipage/dom.html#document`) + [Web IDL](`https://webidl.spec.whatwg.org/`) Living Standards
 
-<details markdown="1" class="admonition note collapsible">
-  <summary markdown="span"> **[§ 2.5.6.2 Named properties](`https://webidl.spec.whatwg.org/#idl-named-properties`)** *(Web IDL Spec)* 
- </summary>
-An interface that defines a named property getter is said to support named properties. By extension, a platform object is said to support named properties if it implements an interface that itself does.
-   
-If an interface supports named properties, then the interface definition must be accompanied by a description of the ordered set of names that can be used to index the object at any given time. These names are called the supported property names.
+We will track the behavior of named properties in 4 different WebIDL interfaces (and their associated JS objects): `Window`, `Document`, `HTMLFormElement`, and `HTMLCollection`.
 
-</details>
+*NOTE: I know traversing the HTML + Web IDL specs is very tedius, so I included all relevant excerpts in the expandable blue boxes!*
 
-Supporting snippets from the HTML + Web IDL Living standards are included. They can be toggled to be hidden or open. (#TODO: implement)
+### Prerequisite 
 
+Feel free to skip this section if you already know the basics of Web IDL interfaces/spec?!
 
-### Terminology 
+The Web IDL 
 
-- **Web IDL Interface**: ... (#TODO). We will study the `Window`, `Document`, ... interfaces.  
-- **Web IDL? platform object**: 
+### Definitions 
 
-### A Named Property
+A lot of the terminology you encounter in these specs is confusing.
+
+Let's clarify some base definitions: 
+
+#TODO: have code examples for these 
+- **supported property names**: a set of strings (an object's proprety *keys*) that the interface promises to expose. This set is (#TODO: check) built once by traversing the interface object? in tree order and pulling out certain `name` or `id` attribute values
+- **named elements**: the actual DOM `Element` node you will get back when you do a lookup for one of the names within the supported property names (ex. `window.bar` returns `<div id="bar">`). Depending on how many there are, you then return either a single element, an HTMLCollection, or (in the special <iframe> case) a WindowProxy (#TODO: check over).
+
+- **named object**: the JS-level value you get back when 
+
+So for each interface we visit, the browser will do the following: 
+1. First, the browser builds/maintains the supported property names list for the Document interface.
+2. Then, when you do document.foo, it gathers the named elements whose id or name is "foo".
+3. Finally it applies the “named‑property lookup” rules (one element → return that element; multiple → HTMLCollection; none → undefined).
+
+### Named Properties 
 
 Let's say your website contains the following HTML element: `<img id="myImg">`. Running `window.myImg` in the developer console returns a reference to that specific `img` element. 
 
-This is an example of a **named property** - or more formally, "dynamic properties added on top of fixed properties to WebIDL- objects/platform objects?" 
+This is an example of a **named property** (or more formally, *"dynamic properties added on top of fixed properties to WebIDL platform objects"*). 
 
-> [!TIP] my own title 
-> **Web IDL Spec: [§ 2.5.6.2 Named properties](`https://webidl.spec.whatwg.org/#idl-named-properties`)** 
->  
-> An interface that defines a named property getter is said to support named properties. By extension, a platform object is said to support named properties if it implements an interface that itself does.
->   
-> If an interface supports named properties, then the interface definition must be accompanied by a description of the ordered set of names that can be used to index the object at any given time. These names are called the supported property names.
+<details markdown="1" class="admonition note collapsible">
+<summary markdown="span">
+  **<a href="https://webidl.spec.whatwg.org/#idl-named-properties" 
+          target="_blank" rel="noopener">§ 2.5.6.2 Named properties</a>** *(Web IDL Spec)*
+</summary>
 
-As per [§ 2.5.6.2 Named properties](`https://webidl.spec.whatwg.org/#idl-named-properties`), all interfaces (ex. `Window`, `Document`, etc.) that have support for named properties define  two things: 
-1) a **named property getter**
-2) a description of the **supported property names** (or an *ordered set* of strings that are valid property names on instances of that interface) 
+An interface that defines a named property getter is said to **support named properties**. By extension, a platform object is said to support named properties if it implements an interface that itself does.
+   
+If an interface supports named properties, then the interface definition must be accompanied by a description of the ordered set of names that can be used to index the object at any given time. These names are called the **supported property names**.
+</details>
 
-Given that each interface with named properties support must define their individual behaviour, we can conclude that not all WebIDL-defined interfaces that support named properties behave the same in regards to them. 
+As per [§ 2.5.6.2 Named properties](`https://webidl.spec.whatwg.org/#idl-named-properties`), all interfaces (ex. `Window`, `Document`, etc.) that have support for named properties define two things:
 
-The following sections will compare named properties behaviour for `Window`, `Document`, `HTMLFormElement` interfaces. (#TODO: add if we do more)
+1) a <span style="color: #d8b862;"><b>named property getter </b></span>  
+2) a description of how the <span style="color: #d8b862;"><b>supported property names</b></span> is formed
 
-### Named properties on? `Window`
+Given each interface with support for named properties must define these two things, we can infer that not all WebIDL-defined interfaces that support them will behave the same.
+
+Hence, we will need to reference the specs of our 4 interfaces indvidually. By the end of this section, we want to have the following table filled out: 
+
+<table>
+  <thead>
+    <tr>
+      <th>Interface</th>
+      <th>Supported Property Names</th>
+      <th>Lookup Algorithm</th>
+      <th>Single vs. Collection</th>
+      <th>Property Shadowing Behavior</th>
+      <th>Case Sensitivity</th>
+      <th>Return Value When Missing</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Window</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Document</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>HTMLFormElement</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>HTMLCollection</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+### Named properties of the `Window` interface 
+
+Before we look at the behavior of named properties on `Window`, let's look at it's interface definition.
 
 > [!TIP] 7.2.2 
 > **HTML Spec: [§ 7.2.2 The `Window` Object](`https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-window-object`)**  
@@ -168,7 +281,6 @@ There are two relevant algorithms the browser needs:
 
 And the **document-tree child navigable target name property set** (a mouthful!) can be found in: 
 
-
 ```
 https://html.spec.whatwg.org/multipage/nav-history-apis.html#named-access-on-the-window-object #TODO: fix formatting 
 
@@ -206,14 +318,13 @@ Let's get some definitions out of the way:
 
 For more clairty, let's do a rough implementation of Algorithm 1 in code: 
 
-```JavaScript 
+```javascript 
 
 // get all navigable containers 
 
-// get tree walker 
+// get tree walker - make sure it returns in tree order  
 
-
-
+const treewalker = "hello";  
 ```
 
 #### Algorithm 2
@@ -233,7 +344,7 @@ FROM CHAT: confirm
 
 - mention how being `[Global]` disables `[LegacyOverrideBuiltIns]` (+ cannot define named-property setters, indexed getters/setters or constructors??) -> is this relevant? 
 
-### Named properties on `Document`
+### Named properties on the `Document` interface 
 
 https://html.spec.whatwg.org/#the-document-object
 - `LegacyOverrideBuiltIns`
@@ -292,7 +403,6 @@ To determine the value of a named property name for a Document, the user agent m
 ```
 
 ``` JavaScript 
-
 namedElements = Object.Array ...
 
 
@@ -304,7 +414,7 @@ namedElements = Object.Array ...
 
 
 
-### Named properties on `HTMLFormElement`
+### Named properties on the `HTMLFormElement` interface
 
 The `HTMLFormElement` interface is annotated with the `LegacyOverrideBuiltIns` extended attribute
 
@@ -336,7 +446,13 @@ So for `HTMLFormElement` objects? and other `LegacyOverrideBuiltins` interfaces?
 This logic seems quite fragile - but that's what happens when browsers must be backwards compatible. Older browsers exposed elements (ex. `<input name="foo">` on `form.foo`) no matter what else was present on the `form` object, and altering such behaviour would break a lot of already-present functionality on the web. (#TODO: verify all of this lol) 
 
 
-### Order of precedence (named property visibility algorithm)
+#### Order of precedence (named property visibility algorithm)
+
+
+
+
+
+
 ### Recap 
 
 ## DOM Clobbering Techniques

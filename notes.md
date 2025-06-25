@@ -89,3 +89,7 @@ ex.
 - have a 'dir' page for 'ctf-writeups'?  
 
 - this URL doesnt make sense w/ the path:http://localhost:4000/ctf-writeups-web/
+- before publishing, figure out if the syntax highligting is correct 
+- before publishing website, organize css
+
+- can use this for a reference on gfm admonitions: https://github.com/Helveg/jekyll-gfm-admonitions

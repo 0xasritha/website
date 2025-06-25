@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Purple Blog Navigation</title>
+    
+<!-- In your _includes/head.html (or directly inside <head>) -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
     <style>
         
       body {
@@ -41,20 +49,21 @@
         }
         a:hover {
             text-decoration: underline;
-            color: #a29bfe;
+            color: #c0dfff;
         }
         details {
             border: 2px dotted #2980b9;
             border-radius: 4px;
             margin: 10px 0;
             padding: 10px;
-            font-size: 12px;
+            color: #2980b9;
         }
         summary {
             cursor: pointer;
             font-weight: bold;
             color: #2980b9;
             outline: none;
+            font-size: 12px;
         }
         /* Scrollbar for code blocks */
         pre::-webkit-scrollbar {
@@ -120,7 +129,27 @@
 
         .content {
             color: #ffffff;
-            font-size: 14px;
+        }
+
+        p { 
+            font-size: 14px; 
+        }
+
+        ul { 
+          font-size: 14px;   
+        }
+        ol { 
+          font-size: 14px;   
+        }
+
+  table {
+    border-collapse: collapse;
+  }
+  table, th, td {
+    border: 1px solid gray;
+  }
+        details p { 
+            font-size: 12px;
         }
 
         /* Breadcrumb style navigation */

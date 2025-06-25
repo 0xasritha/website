@@ -1,0 +1,29 @@
+<head>
+
+</head>
+<body>
+    <form id="myForm" action="/submit" method="POST">
+        <textarea id="userHTML"></textarea>
+        <!--input id="submit"-->
+        <button id="render"> Render HTML </button>
+    </form>  
+
+    <script>
+        const form = document.getElementById('myForm'); 
+        const userHTML = document.getElementById('userHTML');
+        const renderBtn = document.getElementById('render')
+
+        renderBtn.addEventListener('click', e => { 
+            e.preventDefault(); 
+
+            const cleanHTML = DOMPurify.sanitize(userHTML.value);
+            form.insertAdjacentHTML('beforeend', cleanHTML);
+
+            try { 
+                form.submit(); 
+            } catch (err) { 
+                console.error("How did you get here?", err);
+            }
+        }) 
+    </script>
+</body>

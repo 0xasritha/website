@@ -6,5 +6,10 @@ collections:
 plugins:
   - jekyll-gfm-admonitions
 markdown: kramdown
+highlighter: rogue 
 kramdown:
   parse_block_html: true
+  input: GFM 
+  syntax_highlighter_opts: 
+    block: 
+      line_numbers: true 
