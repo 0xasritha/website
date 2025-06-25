@@ -337,9 +337,9 @@ Beyond that, I like <span class="bold">Monster</span>, <span class="bold">LEDs</
                     </div>
                     <div class="sub-files">
                         {% for post in site.blog %}
-                        <a class="file" href="{{ post.url | relative_url }}">
+                        <div>  <a class="file" href="{{ post.url | relative_url }}">
                           {{ post.path | split: '/' | last }}
-                        </a>
+                          </a> </div>
                         {% endfor %}
                     </div>
                     

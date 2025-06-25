@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purple Blog Navigation</title>
+    <style>
+        
+      body {
+            font-family: 'Courier New', monospace;
+            background-color: #0f0f0f;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+        }
+        h1, h2, h3, h4, h5 {
+            /* color: #6c5ce7; */
+            color: #2980b9; /* Light blue for mermaid */
+        }
+        a {
+            color: #74b9ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #a29bfe;
+        }
+        details {
+            border: 2px dotted #2980b9;
+            border-radius: 4px;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 12px;
+        }
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #2980b9;
+            outline: none;
+        }
+        /* Scrollbar for code blocks */
+        pre::-webkit-scrollbar {
+            width: 8px;
+        }
+        pre::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+        pre::-webkit-scrollbar-thumb {
+            background: #6c5ce7;
+            border-radius: 4px;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px dotted #444444;
+            margin-bottom: 40px;
+        }
+
+        .nav-link {
+            color: #888888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #a29bfe;
+            text-decoration: none;
+        }
+
+        .nav-arrow {
+            font-size: 14px;
+            color: #666666;
+            margin: 0 8px;
+        }
+
+        .back-to-main {
+            color: #888888;
+            text-decoration: none;
+            padding: 6px 12px;
+            border: 1px solid #444444;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .back-to-main:hover {
+            background-color: rgba(108, 92, 231, 0.1);
+            border-color: #6c5ce7;
+            color: #a29bfe;
+        }
+
+        .date-posted {
+            color: #5dade2;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        /* Breadcrumb style navigation */
+        .breadcrumb {
+            color: #666666;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .breadcrumb a {
+            color: #888888;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #a29bfe;
+            text-decoration: none;
+        }
+    </style>
+<style>.markdown-alert{padding:.5rem 1rem;margin-bottom:1rem;color:inherit;border-left:.25em solid #30363d}.markdown-alert>:first-child{margin-top:0}.markdown-alert>:last-child{margin-bottom:0}.markdown-alert .markdown-alert-title{display:flex;font-weight:500;align-items:center;line-height:1}.markdown-alert svg{margin-right:.5rem!important}.markdown-alert svg path{fill:currentColor}.markdown-alert.markdown-alert-note{border-left-color:#4493f8}.markdown-alert.markdown-alert-note .markdown-alert-title{color:#4493f8}.markdown-alert.markdown-alert-important{border-left-color:#ab7df8}.markdown-alert.markdown-alert-important .markdown-alert-title{color:#ab7df8}.markdown-alert.markdown-alert-warning{border-left-color:#9e6a03}.markdown-alert.markdown-alert-warning .markdown-alert-title{color:#d29922}.markdown-alert.markdown-alert-tip{border-left-color:#238636}.markdown-alert.markdown-alert-tip .markdown-alert-title{color:#3fb950}.markdown-alert.markdown-alert-caution{border-left-color:#da3633}.markdown-alert.markdown-alert-caution .markdown-alert-title{color:#f85149}</style></head>
+<body>
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <br>
+        <nav class="breadcrumb">
+          <p> °:•.🐠*.•🪸.•:° ~ </p> 
+
+ <a href="/" onclick="goHome()"><b>~</b></a> /
+
+  
+    <a href="/blog" onclick="goToBlog()">blog</a>
+  
+  
+ / <span class="current-page"> dns-clobbering.md </span> 
+        </nav>
+
+        <br> 
+        <br>
+
+        <h1> DNS Clobbering </h1>
+        <div class="date-posted"> # 24 Jun 2025 </div>
+<hr style="border: none; border-top: 0.3px solid #999; margin: 1em 0;" />
+
+        <br> 
+          <p><strong>Cobber</strong> (in the context of computing): to overwrite</p>
+
+<p>To understand DOM Clobbering, we must understand the intricacies of how <strong>named properties</strong> behave.</p>
+
+<h2 id="named-properties-per-the-html--web-idl-living-standards">Named Properties per the <a href="`https://html.spec.whatwg.org/multipage/dom.html#document`">HTML</a> + <a href="`https://webidl.spec.whatwg.org/`">Web IDL</a> Living Standards</h2>
+
+<details class="admonition note collapsible">
+  <summary> <strong><a href="`https://webidl.spec.whatwg.org/#idl-named-properties`">§ 2.5.6.2 Named properties</a></strong> <em>(Web IDL Spec)</em> 
+ </summary>
+  <p>An interface that defines a named property getter is said to support named properties. By extension, a platform object is said to support named properties if it implements an interface that itself does.</p>
+
+  <p>If an interface supports named properties, then the interface definition must be accompanied by a description of the ordered set of names that can be used to index the object at any given time. These names are called the supported property names.</p>
+
+</details>
+
+<p>Supporting snippets from the HTML + Web IDL Living standards are included. They can be toggled to be hidden or open. (#TODO: implement)</p>
+
+<h3 id="terminology">Terminology</h3>
+
+<ul>
+  <li><strong>Web IDL Interface</strong>: … (#TODO). We will study the <code class="language-plaintext highlighter-rouge">Window</code>, <code class="language-plaintext highlighter-rouge">Document</code>, … interfaces.</li>
+  <li><strong>Web IDL? platform object</strong>:</li>
+</ul>
+
+<h3 id="a-named-property">A Named Property</h3>
+
+<p>Let’s say your website contains the following HTML element: <code class="language-plaintext highlighter-rouge">&lt;img id="myImg"&gt;</code>. Running <code class="language-plaintext highlighter-rouge">window.myImg</code> in the developer console returns a reference to that specific <code class="language-plaintext highlighter-rouge">img</code> element.</p>
+
+<p>This is an example of a <strong>named property</strong> - or more formally, “dynamic properties added on top of fixed properties to WebIDL- objects/platform objects?”</p>
+
+<div class="markdown-alert markdown-alert-tip">
+  <p class="markdown-alert-title"><svg class="octicon octicon-light-bulb" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg> my own title</p>
+  <p><strong>Web IDL Spec: <a href="`https://webidl.spec.whatwg.org/#idl-named-properties`">§ 2.5.6.2 Named properties</a></strong> 
+An interface that defines a named property getter is said to support named properties. By extension, a platform object is said to support named properties if it implements an interface that itself does.
+If an interface supports named properties, then the interface definition must be accompanied by a description of the ordered set of names that can be used to index the object at any given time. These names are called the supported property names.</p>
+</div>
+
+<p>As per <a href="`https://webidl.spec.whatwg.org/#idl-named-properties`">§ 2.5.6.2 Named properties</a>, all interfaces (ex. <code class="language-plaintext highlighter-rouge">Window</code>, <code class="language-plaintext highlighter-rouge">Document</code>, etc.) that have support for named properties define  two things: 
+1) a <strong>named property getter</strong>
+2) a description of the <strong>supported property names</strong> (or an <em>ordered set</em> of strings that are valid property names on instances of that interface)</p>
+
+<p>Given that each interface with named properties support must define their individual behaviour, we can conclude that not all WebIDL-defined interfaces that support named properties behave the same in regards to them.</p>
+
+<p>The following sections will compare named properties behaviour for <code class="language-plaintext highlighter-rouge">Window</code>, <code class="language-plaintext highlighter-rouge">Document</code>, <code class="language-plaintext highlighter-rouge">HTMLFormElement</code> interfaces. (#TODO: add if we do more)</p>
+
+<h3 id="named-properties-on-window">Named properties on? <code class="language-plaintext highlighter-rouge">Window</code></h3>
+
+<div class="markdown-alert markdown-alert-tip">
+  <p class="markdown-alert-title"><svg class="octicon octicon-light-bulb" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg> 7.2.2</p>
+  <p><strong>HTML Spec: <a href="`https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-window-object`">§ 7.2.2 The <code class="language-plaintext highlighter-rouge">Window</code> Object</a></strong></p>
+  <pre><code class="language-IDL">[Global=Window
+Exposed=Window, 
+LegacyUnenumerableNamedProperties]
+interface Window 
+... 
+// Since this is the global object, the IDL named getter adds a NamedPropertiesObject exotic
+// object on the prototype chain. Indeed, this does not make the global object an exotic object.
+// Indexed access is taken care of by the WindowProxy exotic object.
+getter object (DOMString name);
+... 
+</code></pre>
+  <p>.#TODO: get rid of <code class="language-plaintext highlighter-rouge">.</code> for formatting</p>
+</div>
+
+<p>The <code class="language-plaintext highlighter-rouge">Window</code> interface is annotated with the <code class="language-plaintext highlighter-rouge">Global</code> extended attribute. The comment starting with “Since this is a global object …” implies that all <code class="language-plaintext highlighter-rouge">Global</code> interfaces have something called a <code class="language-plaintext highlighter-rouge">NamedPropertiesObject</code> exotic object added by the IDL named getter (#TODO: explain) in their prototype chain.</p>
+
+<h4 id="-windows-prototype-chain-"><u> `window`'s prototype chain </u></h4>
+
+<div class="markdown-alert markdown-alert-tip">
+  <p class="markdown-alert-title"><svg class="octicon octicon-light-bulb" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg> Tip</p>
+  <p><strong>Web IDL Spec: <a href="`https://webidl.spec.whatwg.org/#Global`">§ 3.3.8. [Global]</a></strong>
+For these global interfaces, the structure of the prototype chain and how properties corresponding to interface members will be reflected on the prototype objects will be different from other interfaces. Specifically:</p>
+  <ol>
+  <li>Any named properties will be exposed on an object in the prototype chain – the named properties object – rather than on the object itself.</li>
+  <li>Interface members from the interface will correspond to properties on the object itself rather than on interface prototype objects. 
+Ok, so we know <code class="language-plaintext highlighter-rouge">Window</code> is a <code class="language-plaintext highlighter-rouge">Global</code> interface. Therefore, we can use <code class="language-plaintext highlighter-rouge">§ 3.3.8. Global</code>, to assume? that built in properties of <code class="language-plaintext highlighter-rouge">window</code> will be properties on the <code class="language-plaintext highlighter-rouge">window</code> object itself <em>(2)</em> (#TODO: is this citation correct?), whereas named properties will be part of a “named properties object” that lives within <code class="language-plaintext highlighter-rouge">window</code>’s prototype chain as a <em>special intermediate prototype object.</em> <em>(1)</em></li>
+</ol>
+</div>
+
+<p>So, <code class="language-plaintext highlighter-rouge">window</code>’s prototype chain should follow this rough? structure to the Web IDL spec (#TODO: confirm): <code class="language-plaintext highlighter-rouge">window -&gt; NamedPropertiesObject -&gt; Object.proto -&gt; null</code>.</p>
+
+<div class="markdown-alert markdown-alert-note">
+  <p class="markdown-alert-title"><svg class="octicon octicon-info" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg> Note</p>
+  <p>If you go into the developer console right and type <code class="language-plaintext highlighter-rouge">window.__proto__</code> #TODO: put get prototype of ..?, you won’t see our prototype chain we defined. This is because the Web IDL prototype chain is … #TODO: finish</p>
+</div>
+
+<hr />
+<p>Let’s take a very brief detour. Every object lookup in Javascript (ex. <code class="language-plaintext highlighter-rouge">obj.foo</code>) will first check for <code class="language-plaintext highlighter-rouge">foo</code> as an “own property” (#TODO: define) on <code class="language-plaintext highlighter-rouge">obj</code>. If it finds one, that value is used and any other property named <code class="language-plaintext highlighter-rouge">foo</code> in <code class="language-plaintext highlighter-rouge">obj</code>’s prototype chain is ignored (this is called <strong>prototype-chain shadowing</strong>?). The code below shows an example:</p>
+
+<pre><code class="language-Javascript">// TODO: check over this code 
+const proto = { foo: "from prototype" };
+const obj   = Object.create(proto);
+
+console.log(obj.foo);
+// → "from prototype"  (no own property, so it falls back)
+
+obj.foo = "own property";
+
+console.log(obj.foo);
+// → "own property"   (own property shadows the prototype one)
+</code></pre>
+<hr />
+<p>Understanding prototype-chain shadowing? is important because we can then trace <code class="language-plaintext highlighter-rouge">window</code>’s prototype chain to understand how named properties will get shadowed by global variables + builtins?</p>
+
+<p>For example, lets say Website A has <code class="language-plaintext highlighter-rouge">var login = "Log in here";</code> and <code class="language-plaintext highlighter-rouge">&lt;iframe name="login"&gt;</code> in it’s code. Running <code class="language-plaintext highlighter-rouge">window.login</code> will return <code class="language-plaintext highlighter-rouge">"Log in here"</code>. (#TODO: verify. also insert example w/ built in if that is correct)</p>
+
+<p>To further reinforce this behaviour, a green “Note” in  <code class="language-plaintext highlighter-rouge">§ 3.3.8. Global</code> states:</p>
+
+<blockquote>
+  <p>Placing named properties o… #TODO: come back, idk if need</p>
+</blockquote>
+
+<h4 id="-thenamedpropertiesobject-exotic-"><u> The`NamedPropertiesObject` exotic </u></h4>
+<p>https://webidl.spec.whatwg.org/#named-properties-object</p>
+
+<p>#TODO: come back idk if you need this 
+#TODO: explain how the browser does not actually implement a NamedPropertiesObject? Also no idea if this is true …</p>
+
+<h4 id="-a-named-object-"><u> A named object </u></h4>
+
+<p>But how do know <em>specifically</em> what should be placed in a <code class="language-plaintext highlighter-rouge">window</code>’s <code class="language-plaintext highlighter-rouge">NamedPropertiesObject</code>?</p>
+
+<p>We can call “the value” of a named property (what it references) a <strong>named object</strong> (named property –points to–&gt; named object?).</p>
+
+<div class="markdown-alert markdown-alert-note">
+  <p class="markdown-alert-title"><svg class="octicon octicon-info" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg> Note</p>
+  <p><strong>HTML Spec: <a href="`https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-window-nameditem-filter`">§ 7.2.2.3 Named access on the Window object</a></strong>
+Named objects of <code class="language-plaintext highlighter-rouge">Window</code> object <em>window</em> with the name <em>name</em>, for the purposes of the above algorithm, consist of the following:</p>
+  <ul>
+  <li>document-tree child navigables of window’s associated <code class="language-plaintext highlighter-rouge">Document</code> whose target name is <em>name</em>;</li>
+  <li><code class="language-plaintext highlighter-rouge">embed</code>, <code class="language-plaintext highlighter-rouge">form</code>, <code class="language-plaintext highlighter-rouge">img</code>, or <code class="language-plaintext highlighter-rouge">object</code> elements that have a name content attribute whose value is name and are in a document tree with window’s associated <code class="language-plaintext highlighter-rouge">Document</code> as their root; and</li>
+  <li>HTML elements that have an <code class="language-plaintext highlighter-rouge">id</code> content attribute whose value is <em>name</em> and are in a document tree with window’s associated <code class="language-plaintext highlighter-rouge">Document</code> as their root.</li>
+</ul>
+</div>
+
+<p>To paraphrase  <a href="`https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-window-nameditem-filter`">§ 7.2.2.3 Named access on the Window object</a>, a website’s? named objects can come from the following three places:</p>
+<ol>
+  <li>child navigables (think <code class="language-plaintext highlighter-rouge">&lt;iframe&gt;</code>, <code class="language-plaintext highlighter-rouge">&lt;frame&gt;</code>, etc.) - we will formally define this shortly
+    <ul>
+      <li>each child navigable has a browsing context with a target name - again this will be clear in just a sec</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">&lt;embed&gt;</code>, <code class="language-plaintext highlighter-rouge">&lt;form&gt;</code>, <code class="language-plaintext highlighter-rouge">&lt;img&gt;</code>, or <code class="language-plaintext highlighter-rouge">&lt;object&gt;</code> elements w/ a <code class="language-plaintext highlighter-rouge">name</code> attribute (ex. <code class="language-plaintext highlighter-rouge">&lt;form name="foo"&gt;</code>)</li>
+  <li>any HTML element w/ an <code class="language-plaintext highlighter-rouge">id</code> attribute (etc. <code class="language-plaintext highlighter-rouge">&lt;p id="bar"&gt;</code>)</li>
+</ol>
+
+<p>So the references to these “named objects” will be returned when you run <code class="language-plaintext highlighter-rouge">window.NAME</code> or <code class="language-plaintext highlighter-rouge">window[NAME]</code>?</p>
+
+<p>#TODO: finish - lines 244-329 in Article-Draft</p>
+
+<p>There are two relevant algorithms the browser needs: 
+1) Algorithm to create a <code class="language-plaintext highlighter-rouge">window</code>’s supported named properties (or the ordered set of named properties the object supports https://webidl.spec.whatwg.org/#dfn-supported-property-names)
+2) Look up algorithm to find a nemed object when given a naemd property <em>window.name</em></p>
+
+<h4 id="algorithm-1">Algorithm 1</h4>
+
+<blockquote>
+  <p>https://html.spec.whatwg.org/multipage/nav-history-apis.html#named-access-on-the-window-object #TODO: fix formatting</p>
+
+  <p>The Window object supports named properties. The supported property names of a Window object window at any moment consist of the following, in tree order according to the element that contributed them, ignoring later duplicates:</p>
+
+  <ul>
+    <li>
+      <p>window’s document-tree child navigable target name property set;</p>
+    </li>
+    <li>
+      <p>the value of the name content attribute for all embed, form, img, and object elements that have a non-empty name content attribute and are in a document tree with window’s associated Document as their root; and</p>
+    </li>
+    <li>
+      <p>the value of the id content attribute for all HTML elements that have a non-empty id content attribute and are in a document tree with window’s associated Document as their root.</p>
+    </li>
+  </ul>
+</blockquote>
+
+<p>And the <strong>document-tree child navigable target name property set</strong> (a mouthful!) can be found in:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://html.spec.whatwg.org/multipage/nav-history-apis.html#named-access-on-the-window-object #TODO: fix formatting 
+
+The document-tree child navigable target name property set of a Window object window is the return value of running these steps:
+
+    Let children be the document-tree child navigables of window's associated Document.
+
+    Let firstNamedChildren be an empty ordered set.
+
+    For each navigable of children:
+
+        Let name be navigable's target name.
+
+        If name is the empty string, then continue.
+
+        If firstNamedChildren contains a navigable whose target name is name, then continue.
+
+        Append navigable to firstNamedChildren.
+
+    Let names be an empty ordered set.
+
+    For each navigable of firstNamedChildren:
+
+        Let name be navigable's target name.
+
+        If navigable's active document's origin is same origin with window's relevant settings object's origin, then append name to names.
+
+    Return names.
+</code></pre></div></div>
+
+<p>Let’s get some definitions out of the way:</p>
+<ul>
+  <li><strong>tree order</strong> is just preorder, depth-first traversal of a tree (#TODO: confirm + link spec source).</li>
+  <li><strong>navigable container</strong>: “represent something that can be navigated between documents” (https://html.spec.whatwg.org/multipage/document-sequences.html#infrastructure-for-sequences-of-documents). All navigable elements in HTML5? are: <code class="language-plaintext highlighter-rouge">iframe</code>, <code class="language-plaintext highlighter-rouge">frame</code>, <code class="language-plaintext highlighter-rouge">frameset</code> (#TODO: finish).</li>
+  <li>therefore, <strong>document-tree child navigables</strong> of a a <code class="language-plaintext highlighter-rouge">document</code> are simply a list of <code class="language-plaintext highlighter-rouge">document</code>’s child navigable containers in tree order.</li>
+</ul>
+
+<p>For more clairty, let’s do a rough implementation of Algorithm 1 in code:</p>
+
+<pre><code class="language-JavaScript">
+// get all navigable containers 
+
+// get tree walker 
+
+
+
+</code></pre>
+
+<h4 id="algorithm-2">Algorithm 2</h4>
+
+<hr />
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FROM CHAT: confirm 
+§ 3.7.4.1 [[GetOwnProperty]] says that before falling back to ordinary own‑ or prototype‑lookups, the object runs the “named property visibility algorithm.” If that says “yes, we have a named prop P,” it immediately returns that named property value.
+</code></pre></div></div>
+
+<ul>
+  <li>mention how being <code class="language-plaintext highlighter-rouge">[Global]</code> disables <code class="language-plaintext highlighter-rouge">[LegacyOverrideBuiltIns]</code> (+ cannot define named-property setters, indexed getters/setters or constructors??) -&gt; is this relevant?</li>
+</ul>
+
+<h3 id="named-properties-on-document">Named properties on <code class="language-plaintext highlighter-rouge">Document</code></h3>
+
+<p>https://html.spec.whatwg.org/#the-document-object</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">LegacyOverrideBuiltIns</code></li>
+</ul>
+
+<p>To determine what named elements (#TODO: im not sure if we define this anywhere?) are available on <code class="language-plaintext highlighter-rouge">document</code>, we can read the following:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://html.spec.whatwg.org/#dom-tree-accessors
+
+Named elements with the name name, for the purposes of the above algorithm, are those that are either:
+
+    Exposed embed, form, iframe, img, or exposed object elements that have a name content attribute whose value is name, or
+    Exposed object elements that have an id content attribute whose value is name, or
+    img elements that have an id content attribute whose value is name, and that have a non-empty name content attribute present also.
+
+An embed or object element is said to be exposed if it has no exposed object ancestor, and, for object elements, is additionally either not showing its fallback content or has no object or embed descendants.
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">&lt;object&gt;</code> tags in HTML are used to define a container for external resources (ex. web page, pictures, media players, etc.). So for example, <code class="language-plaintext highlighter-rouge">&lt;object data="flower.jpg"&gt;</code> or <code class="language-plaintext highlighter-rouge">&lt;object data="snippet.html"&gt;</code>. <strong>Fallback content</strong> within an <code class="language-plaintext highlighter-rouge">&lt;object&gt;</code> (and other elements such as <code class="language-plaintext highlighter-rouge">&lt;embed&gt;</code>) is defined as alternative content that is dispalyed whenever the primary content source or resource is not available.<br />
+So based on that, let’s define an <strong>exposed object</strong>: an <code class="language-plaintext highlighter-rouge">&lt;embed&gt;</code>/<code class="language-plaintext highlighter-rouge">&lt;object&gt;</code> element that is not currently displaying its fallback content, does not have any <code class="language-plaintext highlighter-rouge">&lt;object&gt;</code> + <code class="language-plaintext highlighter-rouge">&lt;element&gt;</code> descdendants (recurisve children? #TODO: confirm) + is not nested inside another exposed <code class="language-plaintext highlighter-rouge">&lt;object&gt;</code> or <code class="language-plaintext highlighter-rouge">&lt;embed&gt;</code>.</p>
+
+<p>To paraphrase, named elements in <code class="language-plaintext highlighter-rouge">document</code> are:</p>
+<ol>
+  <li>exposed …</li>
+</ol>
+
+<p>To determine how this set/list? of <strong>named elements</strong> is formed, the spec states:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>The Document interface supports named properties. The supported property names of a Document object document at any moment consist of the following, in tree order according to the element that contributed them, ignoring later duplicates, and with values from id attributes coming before values from name attributes when the same element contributes both:
+
+    the value of the name content attribute for all exposed embed, form, iframe, img, and exposed object elements that have a non-empty name content attribute and are in a document tree with document as their root;
+
+    the value of the id content attribute for all exposed object elements that have a non-empty id content attribute and are in a document tree with document as their root; and
+
+    the value of the id content attribute for all img elements that have both a non-empty id content attribute and a non-empty name content attribute, and are in a document tree with document as their root.
+</code></pre></div></div>
+
+<p>So, now we can translate the look up algorithm to find the value of a named property used by <code class="language-plaintext highlighter-rouge">document</code> into code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>To determine the value of a named property name for a Document, the user agent must return the value obtained using the following steps:
+
+    Let elements be the list of named elements with the name name that are in a document tree with the Document as their root.
+
+    There will be at least one such element, since the algorithm would otherwise not have been invoked by Web IDL.
+
+    If elements has only one element, and that element is an iframe element, and that iframe element's content navigable is not null, then return the active WindowProxy of the element's content navigable.
+
+    Otherwise, if elements has only one element, return that element.
+
+    Otherwise, return an HTMLCollection rooted at the Document node, whose filter matches only named elements with the name name.
+</code></pre></div></div>
+
+<pre><code class="language-JavaScript">
+namedElements = Object.Array ...
+
+
+// TODO: have examples where is not exposed object, and it is not added
+// TODO: have an example HTMLCollection return 
+</code></pre>
+
+<h3 id="named-properties-on-htmlformelement">Named properties on <code class="language-plaintext highlighter-rouge">HTMLFormElement</code></h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">HTMLFormElement</code> interface is annotated with the <code class="language-plaintext highlighter-rouge">LegacyOverrideBuiltIns</code> extended attribute</p>
+
+<blockquote>
+  <p><strong>HTML Spec: <a href="`https://html.spec.whatwg.org/multipage/forms.html#the-form-element`">§ 4.10.3 The <code class="language-plaintext highlighter-rouge">form</code> element</a></strong></p>
+
+  <p><code class="language-plaintext highlighter-rouge">IDL [Exposed=Window,
+LegacyOverrideBuiltIns,
+LegacyUnenumerableNamedProperties]
+interface HTMLFormElement : HTMLElement {
+...
+</code>
+.</p>
+</blockquote>
+
+<h4 id="-legacy-platform-objects-"><u> Legacy platform objects </u></h4>
+
+<p>Remember, a <strong>platform object</strong> is just “an object implementing the [Web IDL] interface in question.” So for the <code class="language-plaintext highlighter-rouge">HTMLFormElement</code> interface, the corresponding platform object is DOM objects that represent the <code class="language-plaintext highlighter-rouge">&lt;form&gt;</code> elements?</p>
+
+<blockquote>
+  <p><strong>Web IDL Spec: <a href="`https://webidl.spec.whatwg.org/#idl-objects`">§ 2.12. Objects implementing interfaces</a></strong><br />
+<strong>Legacy platform objects</strong> are platform objects that implement an interface which does not have a [Global] extended attribute, and which supports indexed properties, named properties, or both.</p>
+</blockquote>
+
+<p>Given <code class="language-plaintext highlighter-rouge">HTMLFormElement</code> supports those properties and is not? <code class="language-plaintext highlighter-rouge">[Global]</code>, <code class="language-plaintext highlighter-rouge">&lt;form&gt;</code>? is a <strong>legacy platform object</strong>.</p>
+
+<blockquote>
+  <p><strong>Web IDL Spec: <a href="`https://webidl.spec.whatwg.org/#LegacyOverrideBuiltIns`">§ 3.4.7 [LegacyOverrideBuiltins]</a></strong> <br />
+If the <code class="language-plaintext highlighter-rouge">[LegacyOverrideBuiltIns]</code> extended attribute appears on an interface, it indicates that for a legacy platform object implementing the interface, properties corresponding to all of the object’s supported property names will appear to be on the object, regardless of what other properties exist on the object or its prototype chain. This means that named properties will always shadow any properties that would otherwise appear on the object. This is in contrast to the usual behavior, which is for named properties to be exposed only if there is no property with the same name on the object itself or somewhere on its prototype chain.</p>
+
+</blockquote>
+
+<p>So for <code class="language-plaintext highlighter-rouge">HTMLFormElement</code> objects? and other <code class="language-plaintext highlighter-rouge">LegacyOverrideBuiltins</code> interfaces?, named properties shadow all other properties of the object (<em>including</em> built-ins, etc.). In fact, to reach the built-in when a colliding named property exists, you would have to do something like <code class="language-plaintext highlighter-rouge">Object.getPrototypeOf(obj).A.call(obj)</code> (#TODO: verify this).</p>
+
+<p>This logic seems quite fragile - but that’s what happens when browsers must be backwards compatible. Older browsers exposed elements (ex. <code class="language-plaintext highlighter-rouge">&lt;input name="foo"&gt;</code> on <code class="language-plaintext highlighter-rouge">form.foo</code>) no matter what else was present on the <code class="language-plaintext highlighter-rouge">form</code> object, and altering such behaviour would break a lot of already-present functionality on the web. (#TODO: verify all of this lol)</p>
+
+<h3 id="order-of-precedence-named-property-visibility-algorithm">Order of precedence (named property visibility algorithm)</h3>
+<h3 id="recap">Recap</h3>
+
+<h2 id="dom-clobbering-techniques">DOM Clobbering Techniques</h2>
+
+<p>Here is the simplest possible scenario of DOM clobbering:</p>
+
+<pre><code class="language-JavaScript">var s = documment.createElement('script'); 
+let config = window.globalConfig || (href: 'script.js'); 
+s.src = config.href; 
+document.body.appendChild(s);
+// TODO: this code is identical to https://domclob.xyz/domc_wiki/ -&gt; rewrite w/ similar premise, or credit
+
+// TODO: insert place where use can insert HTML here but is completely sanitized (HTML encode ALL tags) - so the "vuln" immediately jumps out
+</code></pre>
+
+<p>After reading the above section, our vulnerability should immediately jump out. Although the attacker cannot an XSS payload, they can inject an HTML tag with <code class="language-plaintext highlighter-rouge">id="globalConfig"</code> (ex. <code class="language-plaintext highlighter-rouge">&lt;a id="globalConfig" href="malicious.js"&gt;</code>), and as specified in our named property access?, the user will be able to control <code class="language-plaintext highlighter-rouge">s.src</code>. #TODO: explain better.</p>
+
+<p>#TODO: insert second scenario where named properties overshadow browser APIs (see second scenario in https://domclob.xyz/domc_wiki/)</p>
+
+ 
+
+    </div>
+
+    <script>
+        // Navigation functions
+        function goHome() {
+            // window.location.href = '/';
+        }
+
+        function goToBlog() {
+            // window.location.href = '/blog';
+        }
+
+        function navigatePrev() {
+            // window.location.href = '/blog/previous-post';
+        }
+
+        function navigateNext() {
+            // window.location.href = '/blog/next-post';
+        }
+    </script>
+</body>
+</html>

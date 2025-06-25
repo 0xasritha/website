@@ -2,5 +2,13 @@
 
 source "https://rubygems.org"
 
-gem "jekyll"
+# Mirror GitHub Pages’ exact Jekyll + GFM setup
+gem "github-pages"
+
+group :jekyll_plugins do
+  # Add any other Jekyll plugins here…
+  gem "jekyll-gfm-admonitions"
+end
+
+# (If you ever need Rails, you can uncomment this:)
 # gem "rails"
