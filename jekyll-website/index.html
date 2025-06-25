@@ -1,0 +1,415 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #0f0f0f;
+            color: #ffffff; /* White text for readability */
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Equal width columns */
+            grid-template-rows: auto auto;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center; /* Center items vertically */
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        
+        .ascii-container {
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+        
+        .box {
+            padding: 15px;
+            background-color: #0f0f0f;
+        }
+        
+        /* Add dotted borders for boxes */
+        .bordered-box {
+            border: 2px dotted #6c5ce7; /* Purple border */
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        /* Add height and scroll for blog box */
+        .blog-box {
+            height: 175px; /* Fixed height to match original */
+            overflow-y: auto; /* Add scroll when content overflows */
+        }
+        
+        /* Custom scrollbar styling for dark theme */
+        .blog-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .blog-box::-webkit-scrollbar-track {
+            background: #0f0f0f;
+            border-radius: 4px;
+        }
+        
+        .blog-box::-webkit-scrollbar-thumb {
+            background: #6c5ce7;
+            border-radius: 4px;
+        }
+        
+        .blog-box::-webkit-scrollbar-thumb:hover {
+            background: #a29bfe;
+        }
+        
+        .ascii-art {
+            white-space: pre;
+            line-height: 1.2;
+            font-size: 14px;
+            padding: 10px;
+            display: inline-block;
+        }
+        
+        .mermaid-art {
+            color: #74b9ff; /* Light blue for mermaid */
+        }
+        
+        .file-tree {
+            display: flex;
+            flex-direction: column;
+            padding-left: 5px;
+            font-size: 14px; /* Smaller font for file tree */
+        }
+        
+        .folder {
+            margin: 3px 0;
+            color: #a29bfe; /* Light purple for folders */
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .sub-folder{
+            margin-left: 20px;
+            color: #a29bfe; /* Light purple for folders */
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .sub-files {
+            margin-left: 20px;
+            padding-left: 10px;
+        }
+        
+        .sub-sub-files {
+            margin-left: 40px;
+            padding-left: 10px;
+        }
+        
+        .file {
+            margin: 3px 0;
+            cursor: pointer;
+            color: #2980b9; /* Light blue for mermaid */
+            font-weight: bold;
+        }
+        
+        .file:hover, .folder:hover {
+            text-decoration: underline;
+        }
+        
+        .blog-entry {
+            margin-bottom: 12px;
+            font-size: 12px; /* Smaller font size */
+            line-height: 1.3;
+        }
+        
+        .blog-entry:last-child {
+            margin-bottom: 0;
+        }
+        
+        .blog-date {
+            color: #2980b9; /* Light blue for mermaid */
+            font-weight: 100;
+            display: inline;
+        }
+        
+        .blog-title {
+            color: #2980b9; /* Light blue for mermaid */
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .blog-title:hover {
+            text-decoration: underline;
+            color: #a29bfe;
+        }
+        
+        .blog-description {
+            color: #ffffff;
+            margin-top: 2px;
+        }
+        
+        .date {
+            color: #2980b9;  
+            font-weight: bold;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #dfe6e9;
+            font-size: 14px;
+            border-top: 1px dotted #6c5ce7;
+            padding-top: 15px;
+        }
+        
+        a {
+            color: #6c5ce7; /* Matching purple for links */
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+            color: #a29bfe;
+        }
+        
+        .command {
+            color: #e77c6c; /* Pink for commands */
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Flashing cursor */
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 18px;
+            background-color: #e77c6c;
+            margin-left: 6px;
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .hello {
+            text-align: center; 
+            margin-top: 10px;
+            color: #00cec9;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .social-links {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        .social-links a {
+            color: #d8b862; /* More thematic blue for contact links */
+            margin: 0 7px;
+            font-size: 13px;
+        }
+        
+        .social-links a:hover {
+            color: #a3d8ff;
+        }
+        
+        .highlight {
+            color: #00cec9;
+            font-weight: bold;
+        }
+        
+        .friend-links a {
+            color: #9c88ff; /* Brighter purple for friend links */
+            margin: 0 7px;
+            font-weight: bold;
+        }
+        
+        .friend-links a:hover {
+            color: #c8b6ff;
+        }
+        
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        
+        .intro {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .bold {
+            font-weight: bold;
+            color: #a29bfe; /* Light purple for bold text */
+        }
+
+  .emoji-corner {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    font-size: 12px;
+    pointer-events: none; /* so it never blocks clicks */
+    user-select: none;
+  }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with mermaid to the left of the intro -->
+        <div class="header">
+            <div class="ascii-container">
+                <div class="ascii-art mermaid-art">
+
+              .---.
+             (_,/\ \
+            (`^ ^(  )
+            ) \=  ) (
+       |\_  (.-' '--.)
+        \(  /(_)-(_) \
+         \\/ /\   /`\ \
+          \_/ / . \  //
+             /'---'\`/_
+           _/ ^   ^ ;--;
+       .--`| ^  ^ /`    `),
+      /`  . \  ^ /`  ) .   ').
+ ~^~`/  (    \^ / (       '  \^-~`
+-  ^ ~^-    . )/   .    )  '-.;~^-~^
+   ~^~- ~~-  / `\ - .  ~^~ ,-.`~~^~^
+ ~- `^_~-~^-| \^ \~_~^ -~^~- ~^`~^ 
+  ~_~^- .-./__/\__`\-. ~^_-~^- ~^- 
+     ^~ `-^~=~-`=~-~=-'    ~
+                </div>
+            </div>
+            <div class="intro">
+                <div class="command">$ whoami<span class="cursor"></span></div>
+<p>
+    Hi, my name is Asritha! This website is a record of my random projects in <span class="bold">cybersecurity</span>, <span class="bold">systems</span>, <span class="bold">low-level programming</span>, <span class="bold">infrastructure</span>, and whatever new rabbit hole I will be distracted by in the next 10 minutes. Coding until <span class="bold">4 AM</span> is how I shut off the schizo voices in my head /s /s (not really /s).
+</p>
+
+<p>
+Beyond that, I like <span class="bold">Monster</span>, <span class="bold">LEDs</span>, <span class="bold">Arch Linux </span> (iusearchbtw), and <span class="bold">really wide monitors</span>. I am currently <span class="bold">21</span>, <span class="bold">she/her</span>, and unfortunately in college atm. My lovely boyfriend works on some of the projects here with me.
+</p>
+                <div class="social-links">
+                    [<a href="#">pgp key</a>] [<a href="#">email</a>]  
+                    [<a href="#">twitter</a>] [<a href="#">github</a>]  
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <!-- Box 1: File Browser -->
+            <div class="bordered-box">
+                <div class="command">$ ls -la<span class="cursor"></span></div>
+                <div class="file-tree">
+                    <div class="folder">
+                      <a class="folder"  href="/blog">
+                      blog/
+                      </a> 
+                    </div>
+                    <div class="sub-files">
+                        {% for post in site.blog %}
+                        <a class="file" href="{{ post.url | relative_url }}">
+                          {{ post.path | split: '/' | last }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="folder">
+                      ctf-writeups/
+                    </div>
+                    <div>
+                      <a class="sub-folder"  href="/ctf-writeups-web">
+                      web/
+                      </a> 
+                    </div>
+                    <div class="sub-sub-files">
+                        {% for post in site.ctf-writeups-web %}
+                        <div> <a class="file" href="{{ post.url | relative_url }}">
+                        {{ post.path | split: '/' | last }} </a> </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!--div class="folder">notes/</div-->
+                        <!-- div class="file">example.md /-->
+                    <div class="sub-files">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Box 2: Content -->
+            <div class="bordered-box">
+                <div class="command">$ cat ~/blog && ls -t<span class="cursor"></span></div>
+                <div class="blog-box">
+                    <div class="blog-entry">
+                        <span class="blog-date">[2024-04-23]</span> <a href="#" class="blog-title">wikiwebwalker:</a>
+                        <div class="blog-description">beating the Wiki Game with NLP!</div>
+                    </div>
+                    <div class="blog-entry">
+                        <span class="blog-date">[2023-12-26]</span> <a href="#" class="blog-title">++2023;:</a>
+                        <div class="blog-description">a reflection on 2023 and what's next</div>
+                    </div>
+                    <div class="blog-entry">
+                        <span class="blog-date">[2023-11-23]</span> <a href="#" class="blog-title">hackmass-xi:</a>
+                        <div class="blog-description">the (co-)director's cut</div>
+                    </div>
+                    <div class="blog-entry">
+                        <span class="blog-date">[2023-10-30]</span> <a href="#" class="blog-title">rescuelab-hackathon:</a>
+                        <div class="blog-description">what a linkedin scraper does to a man</div>
+                    </div>
+                    <div class="blog-entry">
+                        <span class="blog-date">[2023-09-26]</span> <a href="#" class="blog-title">obsidian-enjoyer:</a>
+                        <div class="blog-description">obsidian hotkeys and plugins</div>
+                    </div>
+                    <div class="blog-entry">
+                        <span class="blog-date">[2023-09-26]</span> <a href="#" class="blog-title">hello-world:</a>
+                        <div class="blog-description">overhaul of my website</div>
+                    </div>
+                    <div class="blog-entry">
+                        <span class="blog-date">[2023-07-04]</span> <a href="#" class="blog-title">picoctf:</a>
+                        <div class="blog-description">starting CMU's picoCTF challenges</div>
+                    </div>
+                    <div class="blog-entry">
+                        <span class="blog-date">[2023-06-26]</span> <a href="#" class="blog-title">urv:</a>
+                        <div class="blog-description">CICS URV program, exploring how</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+<div class="emoji-corner">
+
+°:•.🐠*.•🪸.•:° Thx for visiting! 
+</div>
+</body>
+</html>

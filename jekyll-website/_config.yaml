@@ -1,0 +1,5 @@
+collections: 
+  ctf-writeups-web:
+    output: true
+  blog:
+    output: true

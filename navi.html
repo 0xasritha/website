@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purple Blog Navigation</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #9d7eff;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 2px dotted #444;
+            margin-bottom: 30px;
+        }
+
+        .nav-link {
+            color: #7fb069;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #9d7eff;
+            text-decoration: underline;
+        }
+
+        .nav-arrow {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .back-to-main {
+            color: #7fb069;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 1px solid #7fb069;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-main:hover {
+            background-color: #7fb069;
+            color: #1a1a1a;
+        }
+
+        /* Content styling to match the purple theme */
+        h1 {
+            color: #9d7eff;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #9d7eff;
+            font-size: 1.8em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .date-posted {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            color: #ccc;
+            font-size: 16px;
+        }
+
+        /* Interactive navigation buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 2px solid #7fb069;
+            color: #7fb069;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .nav-btn:hover {
+            background-color: #7fb069;
+            color: #1a1a1a;
+        }
+
+        .nav-btn:disabled {
+            border-color: #444;
+            color: #444;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:disabled:hover {
+            background: none;
+            color: #444;
+        }
+
+        /* Breadcrumb style navigation */
+        .breadcrumb {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: #7fb069;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #9d7eff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Navigation Bar (like in the green theme) -->
+        <nav class="nav-bar">
+            <div>
+                <span class="nav-arrow">«</span>
+                <a href="#" class="nav-link" onclick="navigatePrev()">previous-post</a>
+            </div>
+            
+            <a href="#" class="back-to-main" onclick="goHome()">Back to Main Page</a>
+            
+            <div>
+                <a href="#" class="nav-link" onclick="navigateNext()">next-post</a>
+                <span class="nav-arrow">»</span>
+            </div>
+        </nav>
+
+        <!-- Breadcrumb Navigation -->
+        <div class="breadcrumb">
+            <a href="#" onclick="goHome()">Home</a> > <a href="#" onclick="goToBlog()">Blog</a> > Current Post
+        </div>
+
+        <!-- Sample Content -->
+        <h1>Sample Blog Post Title</h1>
+        <div class="date-posted"># date_posted == "2024-06-24"</div>
+        
+        <div class="content">
+            <p>This is a sample blog post content with the purple aesthetic from your first image, but featuring the navigation functionality from the green-themed page.</p>
+            
+            <h2>Features Included:</h2>
+            <p>• Top navigation bar with previous/next post links<br>
+            • "Back to Main Page" centered button<br>
+            • Breadcrumb navigation<br>
+            • Bottom navigation buttons<br>
+            • Purple/blue color scheme matching your first image</p>
+        </div>
+
+        <!-- Bottom Navigation Buttons -->
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="navigatePrev()" id="prevBtn">← Previous Post</button>
+            <button class="nav-btn" onclick="navigateNext()" id="nextBtn">Next Post →</button>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functions
+        function goHome() {
+            alert('Navigating to home page...');
+            // window.location.href = '/';
+        }
+
+        function goToBlog() {
+            alert('Navigating to blog index...');
+            // window.location.href = '/blog';
+        }
+
+        function navigatePrev() {
+            alert('Navigating to previous post...');
+            // window.location.href = '/blog/previous-post';
+        }
+
+        function navigateNext() {
+            alert('Navigating to next post...');
+            // window.location.href = '/blog/next-post';
+        }
+
+        // Example of dynamic navigation state
+        function updateNavigationState() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            // Example: disable previous button if this is the first post
+            // prevBtn.disabled = true;
+            
+            // Example: disable next button if this is the last post
+            // nextBtn.disabled = true;
+        }
+
+        // Call on page load
+        updateNavigationState();
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+---
+layout: dir 
+collection: blog
+path: blog
+---
+
+{% for post in site.blog %} 
+
+  <div class="blog-entry">
+    <span class="blog-date"> [{{ post.date || date_to_string }}] </span>
+    <a href="{{ post.url | relative_url }}" class="blog-title">
+        {{ post.path | split: '/' | last }}{% if post.blurb %}{% endif %}
+      </a>  
+      <br>
+      <div class="blog-description"> {{ post.description }} </div>
+  </div>
+{% endfor %} 
+

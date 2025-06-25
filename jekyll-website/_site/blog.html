@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purple Blog Navigation</title>
     <style>
         body {
             font-family: 'Courier New', monospace;
@@ -17,6 +16,7 @@
             max-width: 600px;
             margin: 0 auto;
             padding: 0 40px;
+            height: auto;
         }
         
         @media (max-width: 768px) {
@@ -31,7 +31,8 @@
             }
         }
         h1, h2, h3, h4, h5 {
-            color: #6c5ce7;
+            /* color: #6c5ce7; */
+            color: #2980b9; /* Light blue for mermaid */
         }
         a {
             color: #74b9ff;
@@ -121,7 +122,7 @@
         }
 
         .date-posted {
-            color: #a29bfe;
+            color: #5dade2;
             font-style: italic;
             margin-bottom: 20px;
         }
@@ -147,53 +148,122 @@
             color: #a29bfe;
             text-decoration: none;
         }
+
+        /* === Box showing the files === */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .content-box {
+            padding: 15px;
+            border: 2px dotted #ec9689; 
+            padding: 20px;
+            height: auto; 
+        }
+       
+        .command {
+            color: #e77c6c;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.2rem; 
+        }
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: #e77c6c;
+            margin-left: 4px;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%,100% { opacity: 1; }
+            50%     { opacity: 0; }
+        }
+        .blog-box {
+            overflow-y: auto;
+        }
+        .blog-entry {
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+        }
+        .blog-date {
+            color: #74b9ff;
+            font-weight: 100;
+        }
+        .blog-title {
+            color: #74b9ff;
+            font-weight: bold;
+            text-decoration: none;
+            margin-left: 0.25rem;
+        }
+        .blog-title:hover {
+            text-decoration: underline;
+            color: #a29bfe;
+        }
+        .blog-description {
+          display: inline; 
+            margin-left: 1rem;
+            font-style: italic;
+            color: #ddd;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Breadcrumb Navigation -->
+        <br>
         <nav class="breadcrumb">
-            <a href="./index.html" onclick="goHome()">Home</a> → <a href="#" onclick="goToBlog()">Blog</a> → <span class="current-page">Current Post</span>
+          <p> °:•.🐠*.•🪸.•:°</p> 
+        
+ <a href="/" onclick="goHome()"><b>~</b></a> /
+
+  
+    <a href="/blog" onclick="goToBlog()">blog</a>
+  
+  
+
         </nav>
 
-        <!-- Sample Content -->
-        <h1>Sample Blog Post Title</h1>
-        <div class="date-posted"># date_posted == "2024-06-24"</div>
-        
-        <div class="content">
-            <p>This is a sample blog post content with the purple aesthetic from your first image, but featuring the navigation functionality from the green-themed page.</p>
-            
-            <h2>Features Included:</h2>
-            <p>• Top navigation bar with previous/next post links<br>
-            • "Back to Main Page" centered button<br>
-            • Breadcrumb navigation<br>
-            • Bottom navigation buttons<br>
-            • Purple/blue color scheme matching your first image</p>
+        <br> 
+        <br> 
+
+        <div class="grid">
+          <div class="content-box">
+            <div class="command">
+              $ ls -lt ~/blog  <span class="cursor"></span>
+            </div>
+              <br>
+              <br>
+            <div class="blog-box">
+               
+
+  <div class="blog-entry">
+    <span class="blog-date"> [24 Jun 2025] </span>
+    <a href="/blog/dns-clobbering-deep-dive.html" class="blog-title">
+        dns-clobbering-deep-dive.md
+      </a>  
+      <br>
+      <div class="blog-description"> A deep exploration of DNS clobbering by traversing the HTML specs </div>
+  </div>
+ 
+
+ 
+            </div>
+          </div>
         </div>
-
-
     </div>
 
     <script>
         // Navigation functions
         function goHome() {
-            alert('Navigating to home page...');
             // window.location.href = '/';
         }
-
         function goToBlog() {
-            alert('Navigating to blog index...');
             // window.location.href = '/blog';
-        }
-
-        function navigatePrev() {
-            alert('Navigating to previous post...');
-            // window.location.href = '/blog/previous-post';
-        }
-
-        function navigateNext() {
-            alert('Navigating to next post...');
-            // window.location.href = '/blog/next-post';
         }
     </script>
 </body>

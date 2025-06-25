@@ -14,7 +14,7 @@
             line-height: 1.6;
         }
         .container {
-            max-width: 600px;
+            width: 600px;
             margin: 0 auto;
             padding: 0 40px;
         }
@@ -31,7 +31,8 @@
             }
         }
         h1, h2, h3, h4, h5 {
-            color: #6c5ce7;
+            /* color: #6c5ce7; */
+            color: #2980b9; /* Light blue for mermaid */
         }
         a {
             color: #74b9ff;
@@ -121,7 +122,7 @@
         }
 
         .date-posted {
-            color: #a29bfe;
+            color: #5dade2;
             font-style: italic;
             margin-bottom: 20px;
         }
@@ -152,47 +153,45 @@
 <body>
     <div class="container">
         <!-- Breadcrumb Navigation -->
+        <br>
         <nav class="breadcrumb">
-            <a href="./index.html" onclick="goHome()">Home</a> → <a href="#" onclick="goToBlog()">Blog</a> → <span class="current-page">Current Post</span>
+          <p> °:•.🐠*.•🪸.•:° ~ </p> 
+
+ <a href="/" onclick="goHome()"><b>~</b></a> /
+
+  
+    <a href="#" onclick="goToCTF()">ctf-writeups</a> /
+    <a href="/ctf-writeups-web" onclick="goToWeb()">web</a>
+  
+ / <span class="current-page"> la-ctf-2024.md </span> 
         </nav>
 
-        <!-- Sample Content -->
-        <h1>Sample Blog Post Title</h1>
-        <div class="date-posted"># date_posted == "2024-06-24"</div>
-        
-        <div class="content">
-            <p>This is a sample blog post content with the purple aesthetic from your first image, but featuring the navigation functionality from the green-themed page.</p>
-            
-            <h2>Features Included:</h2>
-            <p>• Top navigation bar with previous/next post links<br>
-            • "Back to Main Page" centered button<br>
-            • Breadcrumb navigation<br>
-            • Bottom navigation buttons<br>
-            • Purple/blue color scheme matching your first image</p>
-        </div>
+        <br> 
+        <br> 
 
+        <h1> LA CTF 2024 </h1>
+        <div class="date-posted"> # 24 Jun 2025 </div>
+        <br> 
+          <p><em>In progress! Come back soon!</em></p>
+ 
 
     </div>
 
     <script>
         // Navigation functions
         function goHome() {
-            alert('Navigating to home page...');
             // window.location.href = '/';
         }
 
         function goToBlog() {
-            alert('Navigating to blog index...');
             // window.location.href = '/blog';
         }
 
         function navigatePrev() {
-            alert('Navigating to previous post...');
             // window.location.href = '/blog/previous-post';
         }
 
         function navigateNext() {
-            alert('Navigating to next post...');
             // window.location.href = '/blog/next-post';
         }
     </script>
