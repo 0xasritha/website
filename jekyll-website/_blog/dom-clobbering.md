@@ -1,5 +1,5 @@
 ---
-name: DNS Clobbering 
+name: DOM Clobbering 
 layout: post
 collection: blog 
 date: 2025-06-24
@@ -52,38 +52,106 @@ DOM clobbering is very context dependent. To easily exploit it, you must first u
 
 ## Named Properties per the [HTML](`https://html.spec.whatwg.org/multipage/dom.html#document`) + [Web IDL](`https://webidl.spec.whatwg.org/`) Living Standards
 
-We will track the behavior of named properties in 4 different WebIDL interfaces (and their associated JS objects): `Window`, `Document`, `HTMLFormElement`, and `HTMLCollection`.
+*NOTE: I know traversing the HTML + Web IDL specs is very tedius, so I included all relevant excerpts in the expandable blue boxes! You don't have to read these to understand the article, but they are there if you want to!*
 
-*NOTE: I know traversing the HTML + Web IDL specs is very tedius, so I included all relevant excerpts in the expandable blue boxes!*
 
-### Prerequisite 
+<br>  
 
-Feel free to skip this section if you already know the basics of Web IDL interfaces/spec?!
 
-The Web IDL 
+### Prerequisites 
 
+Feel free to skip this section if you already know this stuff! 
+
+#### Web IDL Spec 
+
+Understanding the differences between the Web IDL and HTML specs is confusing.
+
+The Web IDL Spec defines an IDL (**Interface Description Language**) - basically a set of interfaces and their syntax, properties, methods, and expected behavior. This IDL is implemented by browser engines to produce the "script-visible" objects you can interact with in JavaScript. 
+
+Interfaces in Web IDL can be annotated with **extended attributes** (e.g. `[Global]`, `[LegacyExtendedAttributes]`?). Extended attributes give browsers additional instructions on binding these interfaces into the JS environment (for ex. #TODO). 
+
+Having a standardized IDL ensures that all major browser engines will expose identical JavaScript-visible APIs, so a website's scripts can behave the same in any browser. 
+
+<details markdown="1" class="admonition note collapsible">
+<summary markdown="span">
+  **<a href="https://webidl.spec.whatwg.org/#idl-objects" 
+          target="_blank" rel="noopener">§ 2.12. Objects implmeneting interfaces</a>** *(Web IDL Spec)*
+</summary>
+
+...
+
+**Platform objects** are objects that implement an interface.
+
+...
+
+In a browser, for example, the browser-implemented DOM objects (implementing interfaces such as `Node` and `Document`) that provide access to a web page’s contents to JavaScript running in the page would be platform objects.
+
+</details>
+
+If you see the term **platform object**, know it simply refers to the corresponding JS object? implementing the Web IDL interface?.  
+
+On the other hand, the HTML spec (the WHATWG HTML Living Standard #TODO: link) sits "above" Web IDL in the stack. The HTML spec describes how various HTML elements bind to Web IDL interface definitions (e.g. a `<form>` element implements the `HTMLFormElement` Web IDL interface) as well as HTML-specific parsing rules and more.  
+
+We will track how named properties behave in 4 key WebIDL interfaces (and their associated JS objects): 
+1. `Window` 
+    - JS object (is global object): `window`
+2. `Document` 
+    - JS object: `document` (#TODO: would this also be a global object?)
+3. `HTMLFormElement`
+    - JS object: instances of any `<form>` element in the DOM 
+4. `HTMLCollection`
+    - JS object: instances of any live collections of elements (e.g `document.forms`, `document.getElementsByTagName()` results, `elemnt.children`, etc.? #TODO: check)
+        - behaves like an array-ish list, but is live and updates as DOM changes (#TODO: check)
+
+#### Prototype-chain shadowing 
+
+
+An object’s **own properties** are those defined directly on the object itself. When you access a property on an object (ex. `obj.foo`), the JavaScript engine first checks whether `foo` exists as an "own property" on `obj`. If it does, that value is returned immediately, and any `foo` further up `obj`'s prototype chain is ignored. 
+
+This behavior — where an own property “shadows” (i.e. takes precedence over) a prototype property with the same name — is known as **prototype-chain shadowing** (#TODO: idk if correct name). The example below shows this behavior in action: 
+
+
+```Javascript 
+// TODO: check over this code 
+const proto = { foo: "from prototype" };
+const obj   = Object.create(proto);
+
+console.log(obj.foo);
+// → "from prototype"  (no own property, so it falls back)
+
+obj.foo = "own property";
+
+console.log(obj.foo);
+// → "own property"   (own property shadows the prototype one)
+```
+
+<br> 
 ### Definitions 
 
 A lot of the terminology you encounter in these specs is confusing.
 
-Let's clarify some base definitions: 
+Let's clarify some core definitions: 
 
 #TODO: have code examples for these 
-- **supported property names**: a set of strings (an object's proprety *keys*) that the interface promises to expose. This set is (#TODO: check) built once by traversing the interface object? in tree order and pulling out certain `name` or `id` attribute values
-- **named elements**: the actual DOM `Element` node you will get back when you do a lookup for one of the names within the supported property names (ex. `window.bar` returns `<div id="bar">`). Depending on how many there are, you then return either a single element, an HTMLCollection, or (in the special <iframe> case) a WindowProxy (#TODO: check over).
-
+- **supported property names**: a set of strings (an object's keys that are properties? #TODO: but isn't every key a property name? ) that the interface promises to expose. This set is (#TODO: check) built once by traversing the interface object? in tree order and pulling out certain `name` or `id` attribute values
+- **named elements**: the actual DOM `Element` node you will get back when you do a lookup for one of the names within the supported property names (ex. `window.bar` returns `<div id="bar">`). Depending on how many there are, you then return either a single element, an HTMLCollection, or (in the special `<iframe>` case) a `WindowProxy` (#TODO: check over).
 - **named object**: the JS-level value you get back when 
+#TODO: chat says named elements mean ones from `document` and named objects are one from `window` but said something different before https://chatgpt.com/c/685d7533-57c8-8006-8d9b-d8698017b507
 
-So for each interface we visit, the browser will do the following: 
+
+So for each interface we visit/reference?, the browser will do the following: 
 1. First, the browser builds/maintains the supported property names list for the Document interface.
-2. Then, when you do document.foo, it gathers the named elements whose id or name is "foo".
-3. Finally it applies the “named‑property lookup” rules (one element → return that element; multiple → HTMLCollection; none → undefined).
+2. Then, when you do `document.foo`, it gathers the named elements whose id or name is `foo`.
+3. Finally it applies the “named‑property lookup” rules (one element → return that element; multiple → `HTMLCollection`; none → `undefined`).
+
+
+<br>   
 
 ### Named Properties 
 
 Let's say your website contains the following HTML element: `<img id="myImg">`. Running `window.myImg` in the developer console returns a reference to that specific `img` element. 
 
-This is an example of a **named property** (or more formally, *"dynamic properties added on top of fixed properties to WebIDL platform objects"*). 
+This is an example of a **named property** (or more formally, *"dynamic properties added on top of fixed properties to WebIDL platform objects"*) (that have a reference to things in the DOM?). 
 
 <details markdown="1" class="admonition note collapsible">
 <summary markdown="span">
@@ -96,14 +164,18 @@ An interface that defines a named property getter is said to **support named pro
 If an interface supports named properties, then the interface definition must be accompanied by a description of the ordered set of names that can be used to index the object at any given time. These names are called the **supported property names**.
 </details>
 
-As per [§ 2.5.6.2 Named properties](`https://webidl.spec.whatwg.org/#idl-named-properties`), all interfaces (ex. `Window`, `Document`, etc.) that have support for named properties define two things:
+As per [§ 2.5.6.2 Named properties](`https://webidl.spec.whatwg.org/#idl-named-properties`), all interfaces (ex. `Window`, `Document`, etc.) that say they support named properties must define two things:
+
+!!Not all intefaces have to support named properties! (#TODO: move) 
 
 1) a <span style="color: #d8b862;"><b>named property getter </b></span>  
 2) a description of how the <span style="color: #d8b862;"><b>supported property names</b></span> is formed
 
-Given each interface with support for named properties must define these two things, we can infer that not all WebIDL-defined interfaces that support them will behave the same.
+Given that each interface with support for named properties must define these two things individually, we know that not all WebIDL-defined interfaces that support them will behave the same.
 
-Hence, we will need to reference the specs of our 4 interfaces indvidually. By the end of this section, we want to have the following table filled out: 
+(#TODO: idk if the stuff above needs to be mentioned)
+
+Hence, we will need to consult the specs of each of our 4 interfaces indvidually with the goal of collecting the following information:
 
 <table>
   <thead>
@@ -157,103 +229,26 @@ Hence, we will need to reference the specs of our 4 interfaces indvidually. By t
   </tbody>
 </table>
 
-
+<br> 
 
 ### Named properties of the `Window` interface 
 
-Before we look at the behavior of named properties on `Window`, let's look at it's interface definition.
+<details markdown="1" class="admonition note collapsible">
+<summary markdown="span">
+  **<a href="https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-window-nameditem-filter" 
+          target="_blank" rel="noopener">§ 7.2.2.3 Named access on the Window object]</a>** *(HTML Spec)*
 
-> [!TIP] 7.2.2 
-> **HTML Spec: [§ 7.2.2 The `Window` Object](`https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-window-object`)**  
->   
-> 
-> ```IDL 
-> [Global=Window
-> Exposed=Window, 
-> LegacyUnenumerableNamedProperties]
-> interface Window 
-> ... 
-> 
->  // Since this is the global object, the IDL named getter adds a NamedPropertiesObject exotic
->  // object on the prototype chain. Indeed, this does not make the global object an exotic object.
->  // Indexed access is taken care of by the WindowProxy exotic object.
->  getter object (DOMString name);
->
-> ... 
-> ```    
->  .#TODO: get rid of `.` for formatting   
+</summary>
 
-The `Window` interface is annotated with the `Global` extended attribute. The comment starting with "Since this is a global object ..." implies that all `Global` interfaces have something called a `NamedPropertiesObject` exotic object added by the IDL named getter (#TODO: explain) in their prototype chain.
+Named objects of `Window` object *window* with the name *name*, for the purposes of the above algorithm, consist of the following:
+ - document-tree child navigables of window's associated `Document` whose target name is *name*;
+- `embed`, `form`, `img`, or `object` elements that have a name content attribute whose value is name and are in a document tree with window's associated `Document` as their root; and 
+- HTML elements that have an `id` content attribute whose value is *name* and are in a document tree with window's associated `Document` as their root.
+</details>
 
-#### <u> `window`'s prototype chain </u>
+We can call "the value" of a named property (what it references) a **named object** (named property --points to--> named object?). ??  
 
-> [!TIP]
-> **Web IDL Spec: [§ 3.3.8. [Global]](`https://webidl.spec.whatwg.org/#Global`)**
->
-> For these global interfaces, the structure of the prototype chain and how properties corresponding to interface members will be reflected on the prototype objects will be different from other interfaces. Specifically:
->
-> 1. Any named properties will be exposed on an object in the prototype chain – the named properties object – rather than on the object itself. 
->
-> 2. Interface members from the interface will correspond to properties on the object itself rather than on interface prototype objects. 
-> 
-
-Ok, so we know `Window` is a `Global` interface. Therefore, we can use `§ 3.3.8. Global`, to assume? that built in properties of `window` will be properties on the `window` object itself *(2)* (#TODO: is this citation correct?), whereas named properties will be part of a "named properties object" that lives within `window`'s prototype chain as a *special intermediate prototype object.* *(1)*
-
-So, `window`'s prototype chain should follow this rough? structure to the Web IDL spec (#TODO: confirm): `window -> NamedPropertiesObject -> Object.proto -> null`. 
-
-> [!NOTE]   
-> If you go into the developer console right and type `window.__proto__` #TODO: put get prototype of ..?, you won't see our prototype chain we defined. This is because the Web IDL prototype chain is ... #TODO: finish 
-
----
-Let's take a very brief detour. Every object lookup in Javascript (ex. `obj.foo`) will first check for `foo` as an "own property" (#TODO: define) on `obj`. If it finds one, that value is used and any other property named `foo` in `obj`'s prototype chain is ignored (this is called **prototype-chain shadowing**?). The code below shows an example: 
-
-```Javascript 
-// TODO: check over this code 
-const proto = { foo: "from prototype" };
-const obj   = Object.create(proto);
-
-console.log(obj.foo);
-// → "from prototype"  (no own property, so it falls back)
-
-obj.foo = "own property";
-
-console.log(obj.foo);
-// → "own property"   (own property shadows the prototype one)
-```
----
-Understanding prototype-chain shadowing? is important because we can then trace `window`'s prototype chain to understand how named properties will get shadowed by global variables + builtins?
-
-For example, lets say Website A has `var login = "Log in here";` and `<iframe name="login">` in it's code. Running `window.login` will return `"Log in here"`. (#TODO: verify. also insert example w/ built in if that is correct)
-
-To further reinforce this behaviour, a green "Note" in  `§ 3.3.8. Global` states: 
-
->  Placing named properties o... #TODO: come back, idk if need
-
-
-#### <u> The`NamedPropertiesObject` exotic </u> 
-https://webidl.spec.whatwg.org/#named-properties-object
-
-#TODO: come back idk if you need this 
-#TODO: explain how the browser does not actually implement a NamedPropertiesObject? Also no idea if this is true ... 
-
-#### <u> A named object </u>
-
-But how do know *specifically* what should be placed in a `window`'s `NamedPropertiesObject`? 
-
-We can call "the value" of a named property (what it references) a **named object** (named property --points to--> named object?). 
-
-> [!NOTE]
-> **HTML Spec: [§ 7.2.2.3 Named access on the Window object](`https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-window-nameditem-filter`)**
-> 
-> Named objects of `Window` object *window* with the name *name*, for the purposes of the above algorithm, consist of the following:
->
-> - document-tree child navigables of window's associated `Document` whose target name is *name*;
->
-> - `embed`, `form`, `img`, or `object` elements that have a name content attribute whose value is name and are in a document tree with window's associated `Document` as their root; and
-> 
-> - HTML elements that have an `id` content attribute whose value is *name* and are in a document tree with window's associated `Document` as their root.
-
-To paraphrase  [§ 7.2.2.3 Named access on the Window object](`https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-window-nameditem-filter`), a website's? named objects can come from the following three places:   
+A `window`'s named objects can come from three places:   
 1. child navigables (think `<iframe>`, `<frame>`, etc.) - we will formally define this shortly 
     - each child navigable has a browsing context with a target name - again this will be clear in just a sec 
 2. `<embed>`, `<form>`, `<img>`, or `<object>` elements w/ a `name` attribute (ex. `<form name="foo">`)
@@ -261,7 +256,17 @@ To paraphrase  [§ 7.2.2.3 Named access on the Window object](`https://html.spec
 
 So the references to these "named objects" will be returned when you run `window.NAME` or `window[NAME]`? 
 
-#TODO: finish - lines 244-329 in Article-Draft 
+#TODO: finish - lines 244-329 in Article-Draft
+#TODO: I still don't understand how the "order" of the supported property names comes into play
+
+#### Supported Property Names 
+
+#### Lookup Algorithm 
+
+#TODO: don't need "Single vs Collection" or "Case Sensitivity"? #TODO: rename "Return Value When Missing"? so its more clear 
+#### Property Shadowing Behavior
+
+#### Return Value When Missing
 
 There are two relevant algorithms the browser needs: 
 1) Algorithm to create a `window`'s supported named properties (or the ordered set of named properties the object supports https://webidl.spec.whatwg.org/#dfn-supported-property-names)
@@ -342,7 +347,6 @@ FROM CHAT: confirm
 § 3.7.4.1 [[GetOwnProperty]] says that before falling back to ordinary own‑ or prototype‑lookups, the object runs the “named property visibility algorithm.” If that says “yes, we have a named prop P,” it immediately returns that named property value.
 ```
 
-- mention how being `[Global]` disables `[LegacyOverrideBuiltIns]` (+ cannot define named-property setters, indexed getters/setters or constructors??) -> is this relevant? 
 
 ### Named properties on the `Document` interface 
 
@@ -446,12 +450,72 @@ So for `HTMLFormElement` objects? and other `LegacyOverrideBuiltins` interfaces?
 This logic seems quite fragile - but that's what happens when browsers must be backwards compatible. Older browsers exposed elements (ex. `<input name="foo">` on `form.foo`) no matter what else was present on the `form` object, and altering such behaviour would break a lot of already-present functionality on the web. (#TODO: verify all of this lol) 
 
 
-#### Order of precedence (named property visibility algorithm)
+
+### "The Why": A Deep Dive into `[Global]` and `[LegacyOverrideBuiltins]` (#TODO: rename)
+
+*NOTE: This section is completely optional*
+
+Before we look at the behavior of named properties on `Window`, let's look at it's interface definition.
+
+> [!TIP] 7.2.2 
+> **HTML Spec: [§ 7.2.2 The `Window` Object](`https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-window-object`)**  
+>   
+> 
+> ```IDL 
+> [Global=Window
+> Exposed=Window, 
+> LegacyUnenumerableNamedProperties]
+> interface Window 
+> ... 
+> 
+>  // Since this is the global object, the IDL named getter adds a NamedPropertiesObject exotic
+>  // object on the prototype chain. Indeed, this does not make the global object an exotic object.
+>  // Indexed access is taken care of by the WindowProxy exotic object.
+>  getter object (DOMString name);
+>
+> ... 
+> ```    
+>  .#TODO: get rid of `.` for formatting   
+
+The `Window` interface is annotated with the `Global` extended attribute. The comment starting with "Since this is a global object ..." implies that all `Global` interfaces have something called a `NamedPropertiesObject` exotic object added by the IDL named getter (#TODO: explain) in their prototype chain.
+
+#### <u> `window`'s prototype chain </u>
+
+> [!TIP]
+> **Web IDL Spec: [§ 3.3.8. [Global]](`https://webidl.spec.whatwg.org/#Global`)**
+>
+> For these global interfaces, the structure of the prototype chain and how properties corresponding to interface members will be reflected on the prototype objects will be different from other interfaces. Specifically:
+>
+> 1. Any named properties will be exposed on an object in the prototype chain – the named properties object – rather than on the object itself. 
+>
+> 2. Interface members from the interface will correspond to properties on the object itself rather than on interface prototype objects. 
+> 
+
+Ok, so we know `Window` is a `Global` interface. Therefore, we can use `§ 3.3.8. Global`, to assume? that built in properties of `window` will be properties on the `window` object itself *(2)* (#TODO: is this citation correct?), whereas named properties will be part of a "named properties object" that lives within `window`'s prototype chain as a *special intermediate prototype object.* *(1)*
+
+So, `window`'s prototype chain should follow this rough? structure to the Web IDL spec (#TODO: confirm): `window -> NamedPropertiesObject -> Object.proto -> null`. 
+
+> [!NOTE]   
+> If you go into the developer console right and type `window.__proto__` #TODO: put get prototype of ..?, you won't see our prototype chain we defined. This is because the Web IDL prototype chain is ... #TODO: finish 
+
+Understanding prototype-chain shadowing? is important because we can then trace `window`'s prototype chain to understand how named properties will get shadowed by global variables + builtins?
+
+For example, lets say Website A has `var login = "Log in here";` and `<iframe name="login">` in it's code. Running `window.login` will return `"Log in here"`. (#TODO: verify. also insert example w/ built in if that is correct)
+
+To further reinforce this behaviour, a green "Note" in  `§ 3.3.8. Global` states: 
+
+>  Placing named properties o... #TODO: come back, idk if need
+
+
+#### <u> The`NamedPropertiesObject` exotic </u> 
+https://webidl.spec.whatwg.org/#named-properties-object
+
+#TODO: come back idk if you need this 
+#TODO: explain how the browser does not actually implement a NamedPropertiesObject? Also no idea if this is true ... 
 
 
 
-
-
+- mention how being `[Global]` disables `[LegacyOverrideBuiltIns]` (+ cannot define named-property setters, indexed getters/setters or constructors??) -> is this relevant? 
 
 ### Recap 
 
@@ -473,3 +537,14 @@ After reading the above section, our vulnerability should immediately jump out. 
 
 #TODO: insert second scenario where named properties overshadow browser APIs (see second scenario in https://domclob.xyz/domc_wiki/)
 
+- https://damjan-smickovski.dev/blog/intigriti_challenge_0724_writeup
+- https://freedium.cfd/https://terjanq.medium.com/dom-clobbering-techniques-8443547ebe94
+    - use this article ^ + the two saved later youtube videos
+    - describe methodology, where you have to figure out what your HTML element returns (ex `<a>` element)
+
+methodology draft:
+0) figure out a way to inject HTML (can be purified by DOMPurify)
+1) figure out what you need to clobber (look for property names ex. `form.xxx`, `window.xxx in code logic that need to be clobbered/logic that should be bypassed) #TODO: is there a safer way to get these in JS? -> create a giant chart of "what returns what" 
+2) find a way to clobber that property 
+
+- DOM Clobbering payload generator? 
